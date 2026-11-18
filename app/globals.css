@@ -1,0 +1,337 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Design tokens — the eight brand tokens are used exactly as specified.
+   Two AA helpers are derived from them for SMALL text only:
+     --muted-text  ≈ --muted, darkened just enough for ≥4.5:1 on --bg and --section
+                   (--muted itself is 4.47:1 on --bg and 4.18:1 on --section)
+     --blue-text   ≈ --blue, darkened for small blue text
+                   (--blue itself is 4.07:1 on white — fine for large text & lines)
+   ───────────────────────────────────────────────────────────────────────────── */
+:root {
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --section: #eaf0f8;
+  --ink: #14243a;
+  --muted: #687386;
+  --blue: #3478f6;
+  --violet: #7865d8;
+  --border: #e5e9f0;
+
+  --muted-text: #5f6a7d;
+  --blue-text: #1f5fd6;
+
+  --ease: cubic-bezier(0.2, 0.7, 0.1, 1);
+  --nav-h: 72px;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-section: var(--section);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-muted-text: var(--muted-text);
+  --color-blue: var(--blue);
+  --color-blue-text: var(--blue-text);
+  --color-violet: var(--violet);
+  --color-border: var(--border);
+
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
+
+  --ease-premium: cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+
+/* ── Base ─────────────────────────────────────────────────────────────────── */
+
+html {
+  scroll-padding-top: calc(var(--nav-h) + 16px);
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  overflow-x: clip;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--blue) 22%, transparent);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* ── Components ───────────────────────────────────────────────────────────── */
+
+@utility glass {
+  background: rgb(255 255 255 / 0.72);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
+  border: 1px solid var(--border);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    0 30px 60px -30px rgb(20 36 58 / 0.18),
+    0 12px 24px -18px rgb(20 36 58 / 0.12);
+}
+
+@utility glass-strong {
+  background: rgb(255 255 255 / 0.86);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  backdrop-filter: blur(24px) saturate(1.5);
+  border: 1px solid var(--border);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 1),
+    0 40px 80px -40px rgb(20 36 58 / 0.22),
+    0 16px 32px -24px rgb(20 36 58 / 0.14);
+}
+
+@utility soft-shadow {
+  box-shadow:
+    0 1px 2px rgb(20 36 58 / 0.04),
+    0 24px 48px -28px rgb(20 36 58 / 0.16);
+}
+
+@utility label-mono {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.4;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* Faint 8px-based grid (lines every 48px), masked so it never reads as a pattern. */
+@utility grid-faint {
+  background-image:
+    linear-gradient(to right, rgb(20 36 58 / 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(20 36 58 / 0.045) 1px, transparent 1px);
+  background-size: 48px 48px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 75%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 75%);
+}
+
+@utility container-x {
+  width: 100%;
+  max-width: 1360px;
+  margin-inline: auto;
+  padding-inline: 16px;
+  @media (width >= 40rem) {
+    padding-inline: 32px;
+  }
+  @media (width >= 64rem) {
+    padding-inline: 48px;
+  }
+}
+
+/* Arrow nudge on CTA hover */
+.cta-arrow {
+  display: inline-block;
+  transition: transform 0.6s var(--ease);
+}
+a:hover .cta-arrow,
+button:hover .cta-arrow,
+a:focus-visible .cta-arrow {
+  transform: translateX(4px);
+}
+
+/* ── Scroll reveal (progressive: only hidden once JS has flagged <html class="js">) ── */
+
+.js [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity 0.9s var(--ease),
+    transform 1.1s var(--ease);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.js [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── Hero intro (CSS, so it never waits on JS) ───────────────────────────── */
+
+@keyframes rise {
+  from {
+    transform: translate3d(0, 105%, 0);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes atmos {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes push-in {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.045);
+  }
+}
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -6px, 0);
+  }
+}
+@keyframes dash {
+  to {
+    stroke-dashoffset: -64;
+  }
+}
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+@keyframes blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.word-rise {
+  display: inline-block;
+  animation: rise 1.1s var(--ease) both;
+  animation-delay: calc(var(--i, 0) * 70ms + 200ms);
+}
+.fade-up {
+  animation: fade-up 1s var(--ease) both;
+  animation-delay: var(--d, 0ms);
+}
+.atmos {
+  animation: atmos 1.6s var(--ease) both;
+}
+.push-in {
+  animation: push-in 10s ease-in-out infinite alternate;
+  will-change: transform;
+}
+.drift {
+  animation: drift var(--drift-dur, 8s) ease-in-out infinite;
+  animation-delay: var(--drift-delay, 0s);
+}
+.flow-line {
+  stroke-dasharray: 4 12;
+  animation: dash 2.8s linear infinite;
+}
+.pulse-ring {
+  animation: pulse-ring 2.6s var(--ease) infinite;
+}
+.blink {
+  animation: blink 2.4s ease-in-out infinite;
+}
+
+/* ── Reduced motion: no autoplay, pinning, parallax or drift. Simple fades stay. ── */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .js [data-reveal] {
+    transform: none;
+    transition: opacity 0.6s linear;
+  }
+  .word-rise,
+  .fade-up {
+    animation: atmos 0.6s linear both;
+    animation-delay: 0ms;
+  }
+  .push-in,
+  .drift,
+  .flow-line,
+  .pulse-ring,
+  .blink {
+    animation: none;
+  }
+}
+
+/* If hydration never completes, show everything rather than leave it hidden. */
+.js.reveal-fallback [data-reveal] {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── Chapter 02: pinned sequence on large, motion-allowed screens; step list elsewhere ── */
+.wf-pinned {
+  display: none;
+}
+@media (min-width: 1024px) and (min-height: 640px) and (prefers-reduced-motion: no-preference) {
+  .wf-pinned {
+    display: block;
+  }
+  .wf-list {
+    display: none;
+  }
+}
+
+@keyframes swap-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.swap-in {
+  animation: swap-in 0.55s var(--ease) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .swap-in {
+    animation: atmos 0.3s linear both;
+  }
+}
